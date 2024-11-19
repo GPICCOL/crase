@@ -10,6 +10,7 @@ from openpyxl import load_workbook
 # Read firm marketing plan
 path = "./input-ready/"
 files = os.listdir(path)
+files = [file for file in files if file.endswith('.xlsx')]
 file = files[0]
 
 def make_filename(file):
@@ -28,17 +29,17 @@ def make_filename(file):
   
   # Open the file in write mode and add three empty lines
   with open(f_name, "w") as file:
-      file.write("\n\n\n")
+      file.write("\r\n\r\n\r\n")
   
   print(f"File '{f_name}' has been created with three empty lines.")
   
   # Create the line containing the restaurant name with appropriate spacing
-  total_length = 84
-  restaurant_string = restaurant_name.center(total_length) + "LS        B1"
-  
+  restaurant_string = restaurant_name.center(42)
+  restaurant_string = restaurant_string.ljust(84) + "LS        B1"
+
   # Append the restaurant name to the file
   with open(f_name, "a") as file:  # Open the file in append mode
-      file.write(restaurant_string + "\n")  # Add the string with a newline
+      file.write(restaurant_string + "\r\n")  # Add the string with a newline
   
   print(f"'{restaurant_string}'")  # Prints the result with quotes to visualize spaces
   
@@ -69,6 +70,17 @@ def make_menu(file, f_name):
       "food_cost": [0.000, 0.000, 0.000, 0.000, 0.000, 0.000, None, None],
   })
   menu = menu[menu["menu_item"].notna()]
+   
+  # Enforce specific data types
+  menu = menu.astype({
+      "menu_item": "string",      # Enforce as string type
+      "menu_prep": "string",      # Enforce as string type
+      "pnp": "int",             # Nullable integer type
+      "portion": "float",         # Float type
+      "marketing": "int",       # Float type
+      "price": "float",           # Float type
+      "food_cost": "float",       # Float type
+  })
   
   # Append menu decisions
   # Create each line and append it
@@ -79,20 +91,20 @@ def make_menu(file, f_name):
       menu_item_line = (
           f"{row['menu_item']:<32}"  # menu_item starts at the beginning
           f"{row['menu_prep']:<20}"  # menu_prep starts at character 32
-          f"{row['pnp']:<6}"         # pnp starts at character 52
-          f"{row['portion']:<11.1f}" # portion starts at character 58
-          f"{row['marketing']:<10}"  # marketing starts at character 68
-          f"{row['price']:<9.1f}"    # price starts at character 79
-          f"{row['food_cost']:<6.3f}"    # price starts at character 88
+          f"{row['pnp']:>1}"         # pnp starts at character 52
+          f"{row['portion']:>10.1f}" # portion starts at character 58
+          f"{row['marketing']:>10}"  # marketing starts at character 68
+          f"{row['price']:>10.2f}"    # price starts at character 79
+          f"{row['food_cost']:>10.3f}"    # price starts at character 88
       )
       with open(f_name, "a") as file:  # Open the file in append mode
-        file.write(menu_item_line + "\n")  # Add the string with a newline
+        file.write(menu_item_line + "\r\n")  # Add the string with a newline
         menu_item_line_count += 1  # Increment the line count
   
   # Add the required number of empty lines to get to 10 menu items
   with open(f_name, "a") as file:
       for _ in range(10 - menu_item_line_count):  # Loop for the required number of lines
-          padded_line = f"{'':<88}0.000\n"  # Pad with spaces to 87 characters, then add "0.000"
+          padded_line = f"{'':<88}0.000\r\n"  # Pad with spaces to 87 characters, then add "0.000"
           file.write(padded_line)
           
   print(f"File '{f_name}' now contains 10 lines, with {menu_item_line_count} menu items and the remaining as blank lines.")
@@ -117,14 +129,15 @@ def make_ops(file, f_name):
   # Write the additional lines to the file
   with open(f_name, "a") as file:
       for line in additional_lines:
-          file.write(line + "\n")
+          file.write(line + "\r\n")
 
 for file in files:
   print(file)
   f_name = make_filename(file)
   menu = make_menu(file, f_name)
+  print(menu)
   make_ops(file, f_name)
-
-
-
-
+  
+  # Close file with EOF character
+  with open(f_name, "a") as file:
+    file.write("\r\n")

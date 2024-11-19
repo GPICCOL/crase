@@ -1,13 +1,13 @@
 
 
 
-                                    Excel Firm 3                                    LS        B1
-Steak                           Filet               2.0   165.0      5000.0    22.0     0.000 
-Chicken                         Game Hen            2.0   165.0      5000.0    21.0     0.000 
-Pasta                           Fresh               2.0   175.0      5000.0    18.0     0.000 
-Wine                            Fresh               2.0   150.0      5000.0    22.0     0.000 
-Wine                            Domestic            2.0   15.0       5000.0    7.5      0.000 
-Spirits                         Top Shelf           2.0   4.0        5000.0    6.5      0.000 
+               Excel Firm 3                                                         LS        B1
+STEAK                           Filet               2     165.0      5000     22.99     0.000
+CHICKEN                         Game Hen            2     165.0      5000     21.00     0.000
+PASTA                           Fresh               2     175.0      5000     18.00     0.000
+PIZZA                           Fresh               2     150.0      5000     22.00     0.000
+WINE                            Domestic            2      15.0      5000      7.50     0.000
+SPIRITS                         Top Shf             2       4.0      5000      6.50     0.000
                                                                                         0.000
                                                                                         0.000
                                                                                         0.000
@@ -22,3 +22,4 @@ Assets - Investments                                0         0
        - Leases                                     0         0
        - Borrowings                                 0         0
 Variances
+
