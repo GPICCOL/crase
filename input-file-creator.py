@@ -15,14 +15,14 @@ file = files[0]
 
 def make_filename(file):
   # Load an Excel file
-  workbook = load_workbook(path + file)
+  workbook = load_workbook(path + file, data_only=True)
   sheet = workbook["Marketing Plan"]
   
   # Read firm, market area, season data
   firm_number = str(re.search(r'\d', file).group())
-  market_area = sheet["C44"].value
-  restaurant_name = sheet["J2"].value
-  season = sheet["J4"].value
+  market_area = sheet["E44"].value
+  restaurant_name = sheet["L2"].value
+  season = sheet["L4"].value
   
   # Create needed variables
   f_name = "RFI" + firm_number + market_area + ".TXT"  # Concatenate the parts to form the file name
@@ -47,17 +47,18 @@ def make_filename(file):
 
 def make_menu(file, f_name):
   # Load an Excel file
-  workbook = load_workbook(path + file)
+  workbook = load_workbook(path + file, data_only=True)
   sheet = workbook["Marketing Plan"]
   
   # Read menu data
   menu_rows = [10 + 2 * i for i in range(8)]
   menu_items = [sheet[f"A{row}"].value for row in menu_rows]
-  menu_preps = [sheet[f"C{row}"].value for row in menu_rows]
-  pnps = [2, 2, 2, 2, 2, 2, None, None]
-  portions = [sheet[f"E{row}"].value for row in menu_rows]
-  mkt = [sheet[f"H{row}"].value for row in menu_rows]
-  prices = [sheet[f"J{row}"].value for row in menu_rows]
+  menu_preps = [sheet[f"E{row}"].value for row in menu_rows]
+  pnps = [sheet[f"C{row}"].value for row in menu_rows]
+  portions = [sheet[f"G{row}"].value for row in menu_rows]
+  mkt = [sheet[f"J{row}"].value for row in menu_rows]
+  prices = [sheet[f"L{row}"].value for row in menu_rows]
+  forecast = [0, 0, 0, 0, 0, 0, 0, 0]
 
   # Menu saved as a pandas dataframe
   menu = pd.DataFrame({
@@ -67,7 +68,8 @@ def make_menu(file, f_name):
       "portion": portions,
       "marketing": mkt,
       "price": prices,
-      "food_cost": [0.000, 0.000, 0.000, 0.000, 0.000, 0.000, None, None],
+      "food_cost": [0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000],
+      "forecast": forecast,
   })
   menu = menu[menu["menu_item"].notna()]
    
@@ -77,9 +79,10 @@ def make_menu(file, f_name):
       "menu_prep": "string",      # Enforce as string type
       "pnp": "int",             # Nullable integer type
       "portion": "float",         # Float type
-      "marketing": "int",       # Float type
+      "marketing": "int",       # Integer type
       "price": "float",           # Float type
       "food_cost": "float",       # Float type
+      "forecast": "int",       # Integer type
   })
   
   # Append menu decisions
@@ -89,13 +92,14 @@ def make_menu(file, f_name):
   for _, row in menu.iterrows():
       # Format the string with exact positions
       menu_item_line = (
-          f"{row['menu_item']:<32}"  # menu_item starts at the beginning
-          f"{row['menu_prep']:<20}"  # menu_prep starts at character 32
-          f"{row['pnp']:>1}"         # pnp starts at character 52
-          f"{row['portion']:>10.1f}" # portion starts at character 58
-          f"{row['marketing']:>10}"  # marketing starts at character 68
-          f"{row['price']:>10.2f}"    # price starts at character 79
-          f"{row['food_cost']:>10.3f}"    # price starts at character 88
+          f"{row['menu_item']:<32}"        # menu_item starts at the beginning
+          f"{row['menu_prep']:<20}"        # menu_prep starts at character 32
+          f"{row['pnp']:>1}"               # pnp starts at character 52
+          f"{row['portion']:>10.1f}"       # portion starts at character 58
+          f"{row['marketing']:>10}"        # marketing starts at character 68
+          f"{row['price']:>10.2f}"         # price starts at character 79 ends at 83
+          f"{row['food_cost']:>10.3f}"     # food cost ends at character 93
+          f"{row['forecast']:>10}"          # forecast is right aligned ending at 103
       )
       with open(f_name, "a") as file:  # Open the file in append mode
         file.write(menu_item_line + "\r\n")  # Add the string with a newline
@@ -112,13 +116,40 @@ def make_menu(file, f_name):
   return menu
 
 def make_ops(file, f_name):
+  # Load an Excel file
+  workbook = load_workbook(path + file, data_only=True)
+  sheet = workbook["Marketing Plan"]
+  
+  # Read firm, market area, season data
+  fte = sheet["E27"].value
+  training = sheet["E29"].value  
+  big4 = sheet["E33"].value
+  music = sheet["E35"].value
+  maintenance = sheet["E37"].value
+  
+  # Creat operations decisions line
+  ops_decisions = (
+    f"{'Operations':<43}"   # Operations left aligned
+    f"{fte:>10.1f}"         # full time equivalents are right aligned to position 53
+    f"{training:>10.2f}"    # training is 10 characters right aligned 2 decimal
+    f"{big4:>10.2f}"         # big4 is 10 characters right aligned 2 decimal
+    f"{music:>10}"          # music is 10 characters right aligned integer
+    f"{maintenance:>10}" # maintenance is 10 characters right aligned integer
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{'12000':>10}"       # unknown padding 12000 value is 10 characters right aligned
+)
+
   # Define the additional lines to be added
-  additional_lines = [
+  additional_lines1 = [
       "Management                                        1.5       0.0       0.0         0         0         0         0         0         0         0",
       "Supervisory                                       1.0       0.0       0.0         0         0         0         0         0         0         0",
       "Service                                          10.0       0.0       0.0         0         0",
       "Support                                           9.0       0.0       0.0         0         0",
-      "Operations                                       36.0     10.25      0.28      6500     19500         0         0         0         0     12000",
+  ]
+  additional_lines2 = [      
       "Finance                                             0         0         0         0         0         0         0         0         0         0",
       "Assets - Investments                                0         0",
       "       - Leases                                     0         0",
@@ -128,7 +159,10 @@ def make_ops(file, f_name):
   
   # Write the additional lines to the file
   with open(f_name, "a") as file:
-      for line in additional_lines:
+      for line in additional_lines1:
+          file.write(line + "\r\n")
+      file.write(ops_decisions + "\r\n")
+      for line in additional_lines2:
           file.write(line + "\r\n")
 
 for file in files:
@@ -141,3 +175,4 @@ for file in files:
   # Close file with EOF character
   with open(f_name, "a") as file:
     file.write("\r\n")
+
