@@ -126,8 +126,11 @@ def make_ops(file, f_name):
   big4 = sheet["E33"].value
   music = sheet["E35"].value
   maintenance = sheet["E37"].value
+  infoguest = 1 if sheet["E42"].value == "Yes" else 0
+  infofin = 1 if sheet["G42"].value == "Yes" else 0
+  infoprod = 1 if sheet["J42"].value == "Yes" else 0
   
-  # Creat operations decisions line
+  # Create operations decisions line
   ops_decisions = (
     f"{'Operations':<43}"   # Operations left aligned
     f"{fte:>10.1f}"         # full time equivalents are right aligned to position 53
@@ -135,12 +138,27 @@ def make_ops(file, f_name):
     f"{big4:>10.2f}"         # big4 is 10 characters right aligned 2 decimal
     f"{music:>10}"          # music is 10 characters right aligned integer
     f"{maintenance:>10}" # maintenance is 10 characters right aligned integer
-    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
-    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
-    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{infoguest:>10}"           # guest satisfaction 10 characters right aligned
+    f"{infofin:>10}"           # financial report 10 characters right aligned
+    f"{infoprod:>10}"           # product report 10 characters right aligned
     f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
     f"{'12000':>10}"       # unknown padding 12000 value is 10 characters right aligned
 )
+
+# # Create finance decisions line
+#   fin_decisions = (
+#     f"{'Operations':<43}"   # Operations left aligned
+#     f"{fte:>10.1f}"         # full time equivalents are right aligned to position 53
+#     f"{training:>10.2f}"    # training is 10 characters right aligned 2 decimal
+#     f"{big4:>10.2f}"         # big4 is 10 characters right aligned 2 decimal
+#     f"{music:>10}"          # music is 10 characters right aligned integer
+#     f"{maintenance:>10}" # maintenance is 10 characters right aligned integer
+#     f"{infoguest:>10}"           # guest satisfaction 10 characters right aligned
+#     f"{infofin:>10}"           # financial report 10 characters right aligned
+#     f"{infoprod:>10}"           # product report 10 characters right aligned
+#     f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+#     f"{'12000':>10}"       # unknown padding 12000 value is 10 characters right aligned
+# )
 
   # Define the additional lines to be added
   additional_lines1 = [

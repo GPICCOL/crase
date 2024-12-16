@@ -13,6 +13,9 @@ workbook = load_workbook(path + file, data_only=True)
 sheet = workbook["Marketing Plan"]
 
 print(sheet["E10"].value)
+infoguest = 1 if sheet["E42"].value == "Yes" else 0
+infofin = 1 if sheet["G42"].value == "Yes" else 0
+infoprod = 1 if sheet["J42"].value == "Yes" else 0
 
 menu_rows = [10 + 2 * i for i in range(8)]
 menu_items = [sheet[f"A{row}"].value for row in menu_rows]
