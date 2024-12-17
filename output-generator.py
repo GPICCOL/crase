@@ -65,13 +65,33 @@ def subset_pdf(input_pdf, output_pdf, pages):
   print(f"PDF with pages {pages_to_keep} saved as {output_pdf}")
 
 # P&L and income statement extractor
-def extract_values(page):
+def extract_pl_is(page, statement):
   # Define labels to extract
-  labels = [
-      "Food Sales", "Beverage Sales", "Food Cost", "Beverage cost",
-      "Payroll", "Employee benefits", "Cash on hand",
-      "Time Deposits 3%", "Furniture & Fixtures"
-  ]
+  if statement == "pl":
+      labels = [
+        "Food Sales", "Beverage Sales", "Food Cost", "Beverage cost",
+        "Payroll", "Employee benefits", "Direct Operating",
+        "Music & Entertainment", "Repairs & Maintenance",
+        "Admin. & General", "Advertising & Promo.", "Utilities",
+        "Franchise Fees", "Property Tax",
+        "Rentals & misc.", "Liquor Lic. Fee",
+        "Insurance", "Amortization", "Interest - Long term",
+        "Depreciation", "Extraordinary Inc/Exp", "Interest - Short term",
+        "Income Tax"
+      ]
+      
+  elif statement == "is":
+    labels = [
+      "Cash on hand", "Time Deposits 3%", "Cert. of deposit, 5%(6MOS)",
+      "Other current assets", "Accounts Rec. (net)", "Inventories",
+      "Affiliate Receivable", "Subsidary Companies", "Furniture & Fixtures",
+      "Equipment", "Building & Improvements", "Land",
+      "Franchise Agreement", "Leased Property", "Accounts Payable",
+      "Notes Payable, 13%", "Line of Credit, 15%", "Mortgage-Current portion",
+      "Lease - Current portion", "Affiliate Payable", "Mortgage",
+      "Capitalized Leases", "Common Stock @ 10 Par", "Additional Paid in Capital",
+      "Retained Earnings/Deficit"
+    ]
   
   # Dictionary to store extracted values
   extracted_values = {}
@@ -80,7 +100,7 @@ def extract_values(page):
   for label in labels:
       # Use regex to match the label and the number immediately after it
       match = re.search(rf"{label}\s+([\d.,]+)", page)  # Added ',' to capture numbers like 1,234.56
-      print(f"Searching for label: '{label}'")
+      # print(f"Searching for label: '{label}'")
       if match:
           extracted_values[label] = match.group(1)
           print(f"Found: {label} -> {match.group(1)}")
@@ -118,7 +138,7 @@ with open(input_file, 'r') as file:
     content = file.read()
 
 # Split into pages using '1' only when it's the first character in a line
-pages = re.split(r'(?m)^\s*1', content)
+pages = re.split(r'(?m)^1', content)
 
 # Loop through the relevant pages to extract based on the number of firms
 if len(pages) > 1:
@@ -126,10 +146,9 @@ if len(pages) > 1:
     print("Scanning firm " + str(firm))
     page = pages[firm * 2 - 1]          # page is a parameter for the page containint each firm's P&L
     
-    ### IT APPEARS THERE ARE SOME EXTRA PAGES. PAGES 5 is read as firm 3 but it is firm 2
-    
     # Extract values from the uploaded file
-    extracted_data = extract_values(page)
+    extracted_pandl = extract_pl_is(page, "pl")
+    extracted_incst = extract_pl_is(page, "is")
   
 else:
   print("No pages to scan")
