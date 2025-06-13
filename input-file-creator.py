@@ -1,6 +1,3 @@
-# Clear all variables from the current Python namespace
-globals().clear()
-
 import os
 import re
 import json
@@ -13,6 +10,7 @@ files = os.listdir(path)
 files = [file for file in files if file.endswith('.xlsx')]
 file = files[0]
 
+# Function to create the filename and write the initial empty lines
 def make_filename(file):
   # Load an Excel file
   workbook = load_workbook(path + file, data_only=True)
@@ -45,6 +43,7 @@ def make_filename(file):
   
   return f_name
 
+# Function to create the menu decisions lines
 def make_menu(file, f_name):
   # Load an Excel file
   workbook = load_workbook(path + file, data_only=True)
@@ -115,10 +114,13 @@ def make_menu(file, f_name):
   
   return menu
 
+# Function to create the operations decisions lines
 def make_ops(file, f_name):
   # Load an Excel file
   workbook = load_workbook(path + file, data_only=True)
   sheet = workbook["Marketing Plan"]
+  if "Financial Plan" in workbook.sheetnames:
+    sheet2 = workbook["Financial Plan"]
   
   # Read firm, market area, season data
   fte = sheet["E27"].value
@@ -145,21 +147,6 @@ def make_ops(file, f_name):
     f"{'12000':>10}"       # unknown padding 12000 value is 10 characters right aligned
 )
 
-# # Create finance decisions line
-#   fin_decisions = (
-#     f"{'Operations':<43}"   # Operations left aligned
-#     f"{fte:>10.1f}"         # full time equivalents are right aligned to position 53
-#     f"{training:>10.2f}"    # training is 10 characters right aligned 2 decimal
-#     f"{big4:>10.2f}"         # big4 is 10 characters right aligned 2 decimal
-#     f"{music:>10}"          # music is 10 characters right aligned integer
-#     f"{maintenance:>10}" # maintenance is 10 characters right aligned integer
-#     f"{infoguest:>10}"           # guest satisfaction 10 characters right aligned
-#     f"{infofin:>10}"           # financial report 10 characters right aligned
-#     f"{infoprod:>10}"           # product report 10 characters right aligned
-#     f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
-#     f"{'12000':>10}"       # unknown padding 12000 value is 10 characters right aligned
-# )
-
   # Define the additional lines to be added
   additional_lines1 = [
       "Management                                        1.5       0.0       0.0         0         0         0         0         0         0         0",
@@ -167,8 +154,10 @@ def make_ops(file, f_name):
       "Service                                          10.0       0.0       0.0         0         0",
       "Support                                           9.0       0.0       0.0         0         0",
   ]
+  
+  fin_empty_lines = str("Finance                                             0         0         0         0         0         0         0         0         0         0")
+  
   additional_lines2 = [      
-      "Finance                                             0         0         0         0         0         0         0         0         0         0",
       "Assets - Investments                                0         0",
       "       - Leases                                     0         0",
       "       - Borrowings                                 0         0",
@@ -176,13 +165,47 @@ def make_ops(file, f_name):
   ]
   
   # Write the additional lines to the file
-  with open(f_name, "a") as file:
+  with open(f_name, "a") as f:
       for line in additional_lines1:
-          file.write(line + "\r\n")
-      file.write(ops_decisions + "\r\n")
+          f.write(line + "\r\n")
+      try:
+         print(sheet2)
+         fin_line = make_fin(file)
+         f.write(fin_line + "\r\n")
+      except NameError:
+         f.write(fin_empty_lines + "\r\n")
+      f.write(ops_decisions + "\r\n")
       for line in additional_lines2:
-          file.write(line + "\r\n")
+          f.write(line + "\r\n")
 
+# Function to create the financial decisions line
+def make_fin(file):
+  # Load an Excel file
+  workbook = load_workbook(path + file, data_only=True)
+  sheet = workbook["Financial Plan"]
+  
+  # Read firm, market area, season data
+  timedep = str(sheet["D7"].value) + str(sheet["E7"].value)
+  certdep = str(sheet["D9"].value) + str(sheet["E9"].value)
+  notepay = str(sheet["D11"].value) + str(sheet["E11"].value)
+  capital = str(sheet["D13"].value) + str(sheet["E13"].value)
+  dividend = str(sheet["D15"].value) + str(sheet["E15"].value)
+  
+  # Create financial decisions line
+  fin_decisions = (
+    f"{'Finance':<43}"   # Financial left aligned, padded to 43 characters
+    f"{timedep:>10}"         # sales are right aligned to position 53
+    f"{certdep:>10}"    # food cost is 10 characters right aligned 2 decimal
+    f"{notepay:>10}"         # beverage cost is 10 characters right aligned 2 decimal
+    f"{capital:>10}"          # labor cost is 10 characters right aligned integer
+    f"{dividend:>10}" # other costs is 10 characters right aligned integer
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    f"{'0':>10}"           # unknown padding 0 value is 10 characters right aligned
+    )
+  return fin_decisions
+
+# Main execution
 for file in files:
   print(file)
   f_name = make_filename(file)
