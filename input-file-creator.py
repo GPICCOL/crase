@@ -168,13 +168,13 @@ def make_ops(file, f_name):
   with open(f_name, "a") as f:
       for line in additional_lines1:
           f.write(line + "\r\n")
+      f.write(ops_decisions + "\r\n")
       try:
          print(sheet2)
          fin_line = make_fin(file)
          f.write(fin_line + "\r\n")
       except NameError:
          f.write(fin_empty_lines + "\r\n")
-      f.write(ops_decisions + "\r\n")
       for line in additional_lines2:
           f.write(line + "\r\n")
 
