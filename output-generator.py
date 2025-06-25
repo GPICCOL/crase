@@ -8,10 +8,11 @@ from fpdf import FPDF
 from PyPDF2 import PdfReader, PdfWriter
 
 # Initialization parameters
+total_firms = 6  # Total number of firms
 path = "./output-dashboard/"
 input_file = path + "FR.LST"
 output_file = path + "facilitator.pdf"
-firms = [1, 2, 3]
+firms = list(range(1, total_firms + 1))
 
 # Function Definitions
 # Creation of the full file in pdf (facilitator file)
