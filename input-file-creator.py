@@ -185,11 +185,11 @@ def make_fin(file):
   sheet = workbook["Financial Plan"]
   
   # Read firm, market area, season data
-  timedep = str(sheet["D7"].value) + str(sheet["E7"].value)
-  certdep = str(sheet["D9"].value) + str(sheet["E9"].value)
-  notepay = str(sheet["D11"].value) + str(sheet["E11"].value)
-  capital = str(sheet["D13"].value) + str(sheet["E13"].value)
-  dividend = str(sheet["D15"].value) + str(sheet["E15"].value)
+  timedep = str(sheet["D7"].value or "") + str(sheet["E7"].value or "0")
+  certdep = str(sheet["D9"].value or "") + str(sheet["E9"].value or "0")
+  notepay = str(sheet["D11"].value or "") + str(sheet["E11"].value or "0")
+  capital = str(sheet["D13"].value or "") + str(sheet["E13"].value or "0")
+  dividend = str(sheet["D15"].value or "") + str(sheet["E15"].value or "0")
   
   # Create financial decisions line
   fin_decisions = (
