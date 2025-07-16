@@ -131,6 +131,8 @@ def make_ops(file, f_name):
   infoguest = 1 if sheet["E42"].value == "Yes" else 0
   infofin = 1 if sheet["G42"].value == "Yes" else 0
   infoprod = 1 if sheet["J42"].value == "Yes" else 0
+  food_variance = sheet["O2"].value
+  beverage_variance = sheet["O4"].value
   
   # Create operations decisions line
   ops_decisions = (
@@ -161,9 +163,21 @@ def make_ops(file, f_name):
       "Assets - Investments                                0         0",
       "       - Leases                                     0         0",
       "       - Borrowings                                 0         0",
-      "Variances",
   ]
-  
+
+  variance_lines = str("Variances                                           0         0")
+  if food_variance is not None or beverage_variance is not None:
+      if food_variance is None:
+          food_variance = 0.0
+      if beverage_variance is None:
+          beverage_variance = 0.0
+      # Create the variances line with right alignment
+      variance_lines = (
+          f"Variances{'':<34}"   # Variances left aligned
+          f"{food_variance:>10.2f}"         # food_variance is right aligned to position 53
+          f"{beverage_variance:>10.2f}"    # beverage_variance is 10 characters right aligned 2 decimal
+      )
+                             
   # Write the additional lines to the file
   with open(f_name, "a") as f:
       for line in additional_lines1:
@@ -177,6 +191,7 @@ def make_ops(file, f_name):
          f.write(fin_empty_lines + "\r\n")
       for line in additional_lines2:
           f.write(line + "\r\n")
+      f.write(variance_lines + "\r\n")
 
 # Function to create the financial decisions line
 def make_fin(file):
@@ -216,4 +231,3 @@ for file in files:
   # Close file with EOF character
   with open(f_name, "a") as file:
     file.write("\r\n")
-
